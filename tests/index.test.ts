@@ -1,6 +1,7 @@
+import { zipSync } from 'fflate';
 import { beforeEach, describe, expect, test, vi } from 'vite-plus/test';
 
-import { extractFromPdf, extractFromWord } from '../src/index.ts';
+import { extractFromPdf, extractFromPowerPoint, extractFromWord } from '../src/index.ts';
 
 const { extractRawText, extractText, getDocumentProxy } = vi.hoisted(() => ({
   extractRawText: vi.fn(),
@@ -57,5 +58,19 @@ describe('extractFromWord', () => {
 
     const [{ arrayBuffer }] = extractRawText.mock.calls[0];
     expect(new Uint8Array(arrayBuffer)).toEqual(new Uint8Array([8, 7, 6]));
+  });
+});
+
+describe('extractFromPowerPoint', () => {
+  test('returns text from PPTX slides in slide order', async () => {
+    const encoder = new TextEncoder();
+    const input = zipSync({
+      'ppt/slides/slide2.xml': encoder.encode('<p:sld><p:cSld><p:spTree><a:t>Second</a:t></p:spTree></p:cSld></p:sld>'),
+      'ppt/slides/slide1.xml': encoder.encode(
+        '<p:sld><p:cSld><p:spTree><a:t>First title</a:t><a:t>First body</a:t></p:spTree></p:cSld></p:sld>',
+      ),
+    });
+
+    await expect(extractFromPowerPoint(Buffer.from(input))).resolves.toBe('First title\nFirst body\n\nSecond');
   });
 });

@@ -1,9 +1,10 @@
-import { extractRawText } from 'mammoth';
+import { Document } from '@niicojs/word';
 
-import { toArrayBuffer } from './utils.ts';
+import { toUint8Array } from './utils.ts';
 
 export async function extractFromWord(input: ArrayBuffer | Buffer) {
-  const arrayBuffer = input instanceof ArrayBuffer ? input : toArrayBuffer(input);
-  const text = await extractRawText({ arrayBuffer });
-  return text.value;
+  const buffer = toUint8Array(input);
+  const document = await Document.fromBuffer(buffer);
+  const text = document.extractText();
+  return text;
 }
