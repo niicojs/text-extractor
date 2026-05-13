@@ -3,14 +3,14 @@ import { beforeEach, describe, expect, test, vi } from 'vite-plus/test';
 
 import { extractFromPdf, extractFromPowerPoint, extractFromWord } from '../src/index.ts';
 
-const { extractRawText, extractText, getDocumentProxy } = vi.hoisted(() => ({
-  extractRawText: vi.fn(),
+const { Document, extractText, getDocumentProxy } = vi.hoisted(() => ({
+  Document: { fromBuffer: vi.fn() },
   extractText: vi.fn(),
   getDocumentProxy: vi.fn(),
 }));
 
 vi.mock('unpdf', () => ({ extractText, getDocumentProxy }));
-vi.mock('mammoth', () => ({ extractRawText }));
+vi.mock('@niicojs/word', () => ({ Document }));
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -43,21 +43,22 @@ describe('extractFromPdf', () => {
 describe('extractFromWord', () => {
   test('returns raw text from a Word ArrayBuffer', async () => {
     const input = new Uint8Array([4, 5, 6]).buffer;
-    extractRawText.mockResolvedValue({ value: 'Word text' });
+    const document = { extractText: vi.fn(() => 'Word text') };
+    Document.fromBuffer.mockResolvedValue(document);
 
     await expect(extractFromWord(input)).resolves.toBe('Word text');
 
-    expect(extractRawText).toHaveBeenCalledWith({ arrayBuffer: input });
+    expect(Document.fromBuffer).toHaveBeenCalledWith(new Uint8Array([4, 5, 6]));
+    expect(document.extractText).toHaveBeenCalledOnce();
   });
 
-  test('passes only the Buffer slice bytes to mammoth', async () => {
+  test('passes only the Buffer slice bytes to @niicojs/word', async () => {
     const input = Buffer.from([9, 8, 7, 6, 5]).subarray(1, 4);
-    extractRawText.mockResolvedValue({ value: 'sliced Word text' });
+    Document.fromBuffer.mockResolvedValue({ extractText: vi.fn(() => 'sliced Word text') });
 
     await extractFromWord(input);
 
-    const [{ arrayBuffer }] = extractRawText.mock.calls[0];
-    expect(new Uint8Array(arrayBuffer)).toEqual(new Uint8Array([8, 7, 6]));
+    expect(Document.fromBuffer).toHaveBeenCalledWith(new Uint8Array([8, 7, 6]));
   });
 });
 
