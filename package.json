@@ -1,0 +1,45 @@
+{
+  "name": "@niicojs/text-extractor",
+  "version": "0.0.1",
+  "description": "A text extractor library for Node.js",
+  "homepage": "https://github.com/niicojs/text-extractor#readme",
+  "bugs": {
+    "url": "https://github.com/niicojs/text-extractor/issues"
+  },
+  "license": "MIT",
+  "author": "niico",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/niicojs/text-extractor.git"
+  },
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "exports": {
+    ".": "./dist/index.mjs",
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "vp pack",
+    "dev": "vp pack --watch",
+    "test": "vp test",
+    "check": "vp check",
+    "prepublishOnly": "vp run build"
+  },
+  "dependencies": {
+    "mammoth": "^1.12.0",
+    "unpdf": "^1.6.2"
+  },
+  "devDependencies": {
+    "@types/node": "^25.6.2",
+    "@typescript/native-preview": "7.0.0-dev.20260511.1",
+    "bumpp": "^11.1.0",
+    "typescript": "^6.0.3",
+    "vite-plus": "^0.1.20"
+  },
+  "packageManager": "pnpm@11.1.1"
+}
