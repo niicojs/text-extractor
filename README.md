@@ -14,7 +14,7 @@ pnpm add @niicojs/text-extractor
 ```ts
 import { readFile } from 'node:fs/promises';
 
-import { extractFromPdf, extractFromPowerPoint, extractFromWord } from '@niicojs/text-extractor';
+import { extractFromPdf, extractFromPowerPoint, extractFromWord, extractText } from '@niicojs/text-extractor';
 
 const pdfBuffer = await readFile('document.pdf');
 const pdfText = await extractFromPdf(pdfBuffer);
@@ -24,9 +24,15 @@ const wordText = await extractFromWord(docxBuffer);
 
 const pptxBuffer = await readFile('presentation.pptx');
 const powerPointText = await extractFromPowerPoint(pptxBuffer);
+
+const text = await extractText(pdfBuffer, 'pdf');
 ```
 
 ## API
+
+### `extractText(input: ArrayBuffer | Buffer, ext: 'pdf' | 'pptx' | 'docx' | 'txt')`
+
+Dispatches to the matching extractor based on `ext`. For `txt`, it decodes the input with `TextDecoder`.
 
 ### `extractFromPdf(buffer: ArrayBuffer | Buffer)`
 
